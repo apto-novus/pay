@@ -136,17 +136,18 @@ module Pay
       private
 
       def create_stripe_customer
-        customer = ::Stripe::Customer.create(email: email, description: customer_name)
+        customer = ::Stripe::Customer.create(email: email, description: customer_name, source: card_token) # append card source
         update(processor: "stripe", processor_id: customer.id)
 
+        # remove as API restriction, card connected to the customer as 'source' field
         # Update the user's card on file if a token was passed in
-        if card_token.present?
-          ::Stripe::PaymentMethod.attach(card_token, {customer: customer.id})
-          customer.invoice_settings.default_payment_method = card_token
-          customer.save
-
-          update_stripe_card_on_file ::Stripe::PaymentMethod.retrieve(card_token).card
-        end
+        # if card_token.present?
+        #   ::Stripe::PaymentMethod.attach(card_token, {customer: customer.id})
+        #   customer.invoice_settings.default_payment_method = card_token
+        #   customer.save
+        #
+        #   update_stripe_card_on_file ::Stripe::PaymentMethod.retrieve(card_token).card
+        # end
 
         customer
       end

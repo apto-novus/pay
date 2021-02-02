@@ -25,7 +25,8 @@ module Pay
       raise Pay::Error, "Email is required to create a customer" if email.nil?
 
       customer = send("#{processor}_customer")
-      update_card(card_token) if card_token.present?
+      # remove as API restriction, card is connected to the customer via the 'source' field on creation process
+      # update_card(card_token) if card_token.present?
       customer
     end
 
